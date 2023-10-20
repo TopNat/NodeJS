@@ -7,21 +7,47 @@ const getUsers = () => {
 
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, "http://127.0.0.1");
-  console.log(url); 
   const searchParamsKeys = url.searchParams.keys();
-  console.log("searchParamsKeys=", searchParamsKeys);
-  /*
   let isEmpty = false;
   for (let p of searchParamsKeys) {
-    // console.log(p);
     isEmpty = true;
   }
-  console.log(isEmpty);
-*/
-  res.statusCode = 200;
-  res.statusMessage = "OK";
-  res.header = "Content-Type: text/plain";
-  res.end("Hello World!\n");
+
+  if (!isEmpty) {
+    res.statusCode = 200;
+    res.statusMessage = "OK";
+    res.header = "Content-Type: text/plain";
+    res.end("Hello World!\n");
+    return;
+  } else {
+    if (url.searchParams.has("users")) {
+      res.statusCode = 200;
+      res.statusMessage = "OK";
+      res.header = "Content-Type: application/json";
+      res.write(getUsers());
+      res.end();
+      //return;
+    } else if (url.searchParams.has("hello")) {
+      const helloParam = url.searchParams.get("hello");
+
+      if (helloParam.length > 0) {
+        res.statusCode = 200;
+        res.statusMessage = "OK";
+        res.header = "Content-Type: text/plain";
+        res.end(`Hello ${helloParam}!\n`);
+      } else {
+        res.statusCode = 400;
+        res.header = "Content-Type: text/plain";
+        res.end(`Enter a name\n`);
+      }
+      return;
+    } else {
+      res.statusCode = 500;
+      res.header = "Content-Type: text/plain";
+      res.end(`\n`);
+      return;
+    }
+  }
 });
 
 server.listen(3003, () => {
